@@ -1,27 +1,34 @@
-// 文件名: lib/screens/home_screen.dart
 import 'package:flutter/material.dart';
+import '../models/parcel.dart'; // <--- 1. 引入刚才定义的结构体
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    // Scaffold 是页面的脚手架，提供顶部栏、背景色等
+    // --- 2. 模拟从数据库里查出来的一条数据 ---
+    // 在真实 App 中，这里会是从 API 获取的 JSON
+    final Parcel myParcel = Parcel(
+      pickupCode: '7-9981',     // 改个号码试试，看 App 变没变
+      location: '南邮东门邮局',
+      carrier: '邮政快递',
+      status: '待取件',
+      time: '18:20 入库',
+    );
+    // -------------------------------------
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('待取包裹'),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0), // 给四周留点白
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            // --- 核心组件：取件码卡片 ---
-            _buildPickupCard(),
-            
-            const SizedBox(height: 20), // 增加一点垂直间距
-            
-            // --- 核心组件：身份码按钮 ---
+            // --- 3. 把数据传给卡片函数 ---
+            _buildPickupCard(myParcel), 
+            const SizedBox(height: 20),
             _buildIdentityButton(),
           ],
         ),
@@ -29,51 +36,51 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  // 把卡片 UI 封装成一个函数，类似 C 语言把逻辑拆分成子函数
-  Widget _buildPickupCard() {
+  // --- 4. 修改函数签名，让它接收 Parcel 对象 ---
+  Widget _buildPickupCard(Parcel parcel) { 
     return Card(
-      elevation: 4, // 阴影深度，看起来是浮起来的
-      color: Colors.blueGrey[900], // 深色背景，护眼
+      elevation: 4,
+      color: Colors.blueGrey[900],
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Padding(
         padding: const EdgeInsets.all(24.0),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start, // 左对齐
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              '最近待取', 
-              style: TextStyle(color: Colors.white70, fontSize: 14)
+              '最近待取',
+              style: TextStyle(color: Colors.white70, fontSize: 14),
             ),
             const SizedBox(height: 10),
-            const Center( // 取件码居中显示
+            Center(
               child: Text(
-                '3-2056', 
-                style: TextStyle(
-                  color: Colors.white, 
-                  fontSize: 48, // 超大字体
+                parcel.pickupCode, // <--- 5. 这里换成变量！
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 48,
                   fontWeight: FontWeight.bold,
-                  letterSpacing: 2.0, // 字间距，防止看错
+                  letterSpacing: 2.0,
                 ),
               ),
             ),
             const SizedBox(height: 10),
-            const Row(
+            Row(
               children: [
-                Icon(Icons.location_on, color: Colors.orangeAccent, size: 20),
-                SizedBox(width: 5),
+                const Icon(Icons.location_on, color: Colors.orangeAccent, size: 20),
+                const SizedBox(width: 5),
                 Text(
-                  '北区宿舍楼下蜂巢柜', 
-                  style: TextStyle(color: Colors.white, fontSize: 18)
+                  parcel.location, // <--- 6. 变量
+                  style: const TextStyle(color: Colors.white, fontSize: 18),
                 ),
               ],
             ),
             const SizedBox(height: 15),
-            const Divider(color: Colors.white24), // 一条细分割线
-            const Row(
+            const Divider(color: Colors.white24),
+            Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('顺丰速运', style: TextStyle(color: Colors.white70)),
-                Text('14:30 入柜', style: TextStyle(color: Colors.white70)),
+                Text(parcel.carrier, style: const TextStyle(color: Colors.white70)), // <--- 变量
+                Text(parcel.time, style: const TextStyle(color: Colors.white70)),    // <--- 变量
               ],
             )
           ],
@@ -83,20 +90,18 @@ class HomeScreen extends StatelessWidget {
   }
 
   Widget _buildIdentityButton() {
+    // ... (这部分代码不用动)
     return SizedBox(
-      width: double.infinity, // 按钮占满宽度
-      height: 56,
-      child: ElevatedButton.icon(
-        onPressed: () {
-          print("点击了打开身份码"); // 这里的输出会在 VS Code 的 DEBUG CONSOLE 看到
-        },
-        icon: const Icon(Icons.qr_code, size: 28),
-        label: const Text('打开身份码', style: TextStyle(fontSize: 18)),
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.blueAccent,
-          foregroundColor: Colors.white,
-        ),
-      ),
-    );
+        width: double.infinity,
+        height: 56,
+        child: ElevatedButton.icon(
+          onPressed: () { print("点击了打开身份码"); },
+          icon: const Icon(Icons.qr_code, size: 28),
+          label: const Text('打开身份码', style: TextStyle(fontSize: 18)),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.blueAccent,
+            foregroundColor: Colors.white,
+          ),
+        ));
   }
 }
